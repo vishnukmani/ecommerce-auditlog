@@ -9,6 +9,7 @@ import javax.validation.Valid;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -80,10 +81,14 @@ public class PurchaseController extends AuditLogSaver{
 	  purchase.setUpdatedBy(getUserName());
 	  final Purchase purchased = purchaseRepository.save(purchase);
 	  if(purchased.getId()!= null){
-			auditSaveOperation("INSERTION", getModuleName());
-		}
-	  logger.debug("new purchase added");
-    return ResponseEntity.ok().body(purchased);
+		  auditSaveOperation(INSERT_ACTION, getModuleName(),STATUS_OK);
+		  logger.debug("new purchase added");
+		  return new ResponseEntity<Purchase>(purchased,HttpStatus.OK);
+	  }else{
+		  auditSaveOperation(INSERT_ACTION, getModuleName(),STATUS_ERROR);
+		  logger.debug("new purchase added");
+		  return new ResponseEntity<Purchase>(HttpStatus.INTERNAL_SERVER_ERROR);
+	  }
   }
 
   /**
@@ -103,20 +108,29 @@ public class PurchaseController extends AuditLogSaver{
         purchaseRepository
             .findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("purchase not found on :: " + id));
-
-    purchase.setItemName(purchaseDetails.getItemName());
-    purchase.setItemClassification(purchaseDetails.getItemClassification());
-    purchase.setItemPrice(purchaseDetails.getItemPrice());
-    purchase.setItemName(purchaseDetails.getItemName());
-    purchase.setUpdatedAt(new Date());
-    purchase.setUpdatedBy(getUserName());
-    
-    final Purchase updatedPurchase = purchaseRepository.save(purchase);
-    if(updatedPurchase.getId()!= null){
-		auditSaveOperation("UPDATION", getModuleName());
-		logger.debug("purchase updated");
-	}
-    return ResponseEntity.ok(updatedPurchase);
+    if(purchase!=null){
+    	purchase.setItemName(purchaseDetails.getItemName());
+    	purchase.setItemClassification(purchaseDetails.getItemClassification());
+    	purchase.setItemPrice(purchaseDetails.getItemPrice());
+    	purchase.setItemName(purchaseDetails.getItemName());
+    	purchase.setUpdatedAt(new Date());
+    	purchase.setUpdatedBy(getUserName());
+    	final Purchase updatedPurchase = purchaseRepository.save(purchase);
+    	if(updatedPurchase.getId()!= null){
+    		auditSaveOperation(UPDATE_ACTION, getModuleName(),STATUS_OK);
+    		logger.debug("purchase updated");
+    		return new ResponseEntity<Purchase>(updatedPurchase,HttpStatus.OK);
+    	}else{
+    		auditSaveOperation(UPDATE_ACTION, getModuleName(),STATUS_ERROR);
+    		logger.debug("purchase updated");
+    		return new ResponseEntity<Purchase>(HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+    }else{
+    	auditSaveOperation(UPDATE_ACTION, getModuleName(),STATUS_NOTFOUND);
+    	logger.debug("purchase not found");
+    	return new ResponseEntity<Purchase>(HttpStatus.NOT_FOUND);
+    	
+    }
   }
 
   /**
@@ -128,16 +142,20 @@ public class PurchaseController extends AuditLogSaver{
    */
   @DeleteMapping("/purchase/{id}")
   public Map<String, Boolean> deletePurchase(@PathVariable(value = "id") Long id) throws Exception {
+	  Map<String, Boolean> response = new HashMap<>();
     Purchase purchase =
         purchaseRepository
             .findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("purchase not found on :: " + id));
-
-    purchaseRepository.delete(purchase);
-    Map<String, Boolean> response = new HashMap<>();
-    auditSaveOperation("DELETION", getModuleName());
-    logger.debug("purchase deleted");
-    response.put("deleted", Boolean.TRUE);
+    if(purchase==null){
+    	auditSaveOperation(DELETE_ACTION, getModuleName(),STATUS_NOTFOUND);
+    	response.put("deleted", Boolean.FALSE);
+    	logger.debug("purchase not found");
+    }else{
+    	purchaseRepository.delete(purchase);
+    	auditSaveOperation(DELETE_ACTION, getModuleName(),STATUS_OK);
+    	response.put("deleted", Boolean.TRUE);
+    }
     return response;
   }
 }

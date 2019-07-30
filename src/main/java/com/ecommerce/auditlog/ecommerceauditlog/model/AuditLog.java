@@ -30,6 +30,12 @@ public class AuditLog {
 
     @Column(name = "action_name", nullable = false)
     private String actionName;
+    
+    @Column(name = "response_time", nullable = false)
+    private Long responseTime;
+    
+    @Column(name = "response_status", nullable = false)
+    private String responseStatus;
 
     @CreationTimestamp
     @Temporal(TemporalType.TIMESTAMP)
@@ -109,6 +115,41 @@ public class AuditLog {
     }
 
   /**
+   * Gets responseTime
+   *
+   * @return responseTime
+   */
+  public Long getResponseTime() {
+        return responseTime;
+    }
+
+  /**
+   * Sets responseTime
+   *
+   * @param responseTime the responseTime
+   */
+  public void setResponseTime(Long responseTime) {
+        this.responseTime = responseTime;
+    }
+  /**
+   * Gets responseStatus
+   *
+   * @return responseStatus
+   */
+  public String getResponseStatus() {
+        return responseStatus;
+    }
+
+  /**
+   * Sets responseStatus
+   *
+   * @param responseStatus the responseStatus
+   */
+  public void setResponseStatus(String responseStatus) {
+        this.responseStatus = responseStatus;
+    }
+
+  /**
    * Gets timeStamp
    *
    * @return the timeStamp
@@ -133,6 +174,8 @@ public class AuditLog {
                 ", userName='" + userName + '\'' +
                 ", moduleName='" + moduleName + '\'' +
                 ", actionName='" + actionName + '\'' +
+                ", responseTime='" + responseTime + '\'' +
+                ", responseStatus='" + responseStatus + '\'' +
                 ", timeStamp=" + timeStamp +
                 '}';
     }

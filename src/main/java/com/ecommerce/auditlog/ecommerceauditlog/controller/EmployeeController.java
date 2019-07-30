@@ -37,7 +37,7 @@ public class EmployeeController extends AuditLogSaver{
 	public ResponseEntity<Employee> addEmployee(@RequestBody Employee employee) {
 		//empService.save(employee);
 		empRepository.save(employee);
-		auditSaveOperation(INSERT_ACTION, getModuleName());
+		auditSaveOperation(INSERT_ACTION, getModuleName(),STATUS_OK);
 		logger.debug("Added:: " + employee);
 		return new ResponseEntity<Employee>(employee, HttpStatus.CREATED);
 	}
@@ -49,10 +49,11 @@ public class EmployeeController extends AuditLogSaver{
 		Employee existingEmp = empRepository.findById(employee.getId()).orElseThrow(() -> new ResourceNotFoundException("User not found on :: " + employee.getId()));
 		if (existingEmp == null) {
 			logger.debug("Employee with id " + employee.getId() + " does not exists");
+			auditSaveOperation(UPDATE_ACTION, getModuleName(),STATUS_NOTFOUND);
 			return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
 		} else {
 			empRepository.save(employee);
-			auditSaveOperation(UPDATE_ACTION, getModuleName());
+			auditSaveOperation(UPDATE_ACTION, getModuleName(),STATUS_OK);
 			return new ResponseEntity<Void>(HttpStatus.OK);
 		}
 	}
@@ -90,10 +91,11 @@ public class EmployeeController extends AuditLogSaver{
 		new ResourceNotFoundException("User not found on :: " + id));
 		if (employee == null) {
 			logger.debug("Employee with id " + id + " does not exists");
+			auditSaveOperation(DELETE_ACTION, getModuleName(),STATUS_NOTFOUND);
 			return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
 		} else {
 			empRepository.deleteById(id);
-			auditSaveOperation(DELETE_ACTION, getModuleName());
+			auditSaveOperation(DELETE_ACTION, getModuleName(),STATUS_OK);
 			logger.debug("Employee with id " + id + " deleted");
 			return new ResponseEntity<Void>(HttpStatus.GONE);
 		}

@@ -1,14 +1,13 @@
 package com.ecommerce.auditlog.ecommerceauditlog.controller;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.validation.Valid;
 
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -81,9 +80,12 @@ public class ProductController extends AuditLogSaver{
 		product.setUpdatedBy(getUserName());
 		final Product updatedProduct = productRepository.save(product);
 		if(updatedProduct.getId()!= null){
-			auditSaveOperation(INSERT_ACTION, getModuleName());
+			auditSaveOperation(INSERT_ACTION, getModuleName(),STATUS_OK);
+			logger.debug("new product added");
+		}else{
+			auditSaveOperation(INSERT_ACTION, getModuleName(),STATUS_ERROR);
+			logger.debug("error happened while performing add operation");
 		}
-		logger.debug("new product added");
 		return ResponseEntity.ok(updatedProduct);
 	}
 
@@ -104,20 +106,27 @@ public class ProductController extends AuditLogSaver{
 				productRepository
 				.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("product not found on :: " + id));
-
-		product.setItemName(productDetails.getItemName());
-		product.setItemClassification(productDetails.getItemClassification());
-		product.setItemPrice(productDetails.getItemPrice());
-		product.setItemName(productDetails.getItemName());
-		product.setUpdatedAt(new Date());
-		product.setUpdatedBy(getUserName());
-
-		final Product updatedProduct = productRepository.save(product);
-		if(updatedProduct.getId()!= null){
-			auditSaveOperation(UPDATE_ACTION, getModuleName());
-			logger.debug("product updated");
+		if(product!=null){
+			product.setItemName(productDetails.getItemName());
+			product.setItemClassification(productDetails.getItemClassification());
+			product.setItemPrice(productDetails.getItemPrice());
+			product.setItemName(productDetails.getItemName());
+			product.setUpdatedAt(new Date());
+			product.setUpdatedBy(getUserName());
+			final Product updatedProduct = productRepository.save(product);
+			if(updatedProduct.getId()!= null){
+				auditSaveOperation(UPDATE_ACTION, getModuleName(),STATUS_OK);
+				logger.debug("product updated");
+				return new ResponseEntity<Product>(updatedProduct,HttpStatus.OK);
+			}else{
+				auditSaveOperation(UPDATE_ACTION, getModuleName(),STATUS_ERROR);
+				logger.debug("product updated");
+				return new ResponseEntity<Product>(HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+		}else{
+			auditSaveOperation(UPDATE_ACTION, getModuleName(),STATUS_NOTFOUND);
+			return new ResponseEntity<Product>(HttpStatus.NOT_FOUND);
 		}
-		return ResponseEntity.ok(updatedProduct);
 	}
 
 	/**
@@ -128,18 +137,20 @@ public class ProductController extends AuditLogSaver{
 	 * @throws Exception the exception
 	 */
 	@DeleteMapping("/product/{id}")
-	public Map<String, Boolean> deleteProduct(@PathVariable(value = "id") Long id) throws Exception {
+	public ResponseEntity<Void> deleteProduct(@PathVariable(value = "id") Long id) throws Exception {
 		Product product =
 				productRepository
 				.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("product not found on :: " + id));
-
-		productRepository.delete(product);
-		Map<String, Boolean> response = new HashMap<>();
-
-		auditSaveOperation(DELETE_ACTION, getModuleName());
-		logger.debug("product deleted");
-		response.put("deleted", Boolean.TRUE);
-		return response;
+		if (product == null) {
+			auditSaveOperation(DELETE_ACTION, getModuleName(),STATUS_NOTFOUND);
+			logger.debug("could not find product"+product);
+			return new ResponseEntity<Void>(HttpStatus.NOT_FOUND);
+		}else{
+			productRepository.delete(product);
+			auditSaveOperation(DELETE_ACTION, getModuleName(),STATUS_OK);
+			logger.debug("product deleted");
+			return new ResponseEntity<Void>(HttpStatus.GONE);
+		}
 	}
 }

@@ -1,4 +1,5 @@
 # ecommerce-auditlog
+
 Custom audit log for Rest-apis.
 
 
@@ -18,11 +19,19 @@ no read access given for audit log controller.
 username:user
 password:password
 
-For running application 
+#For running application 
 
 1.clone the project.
 2.right click on the project and 
 3.select Run As-->mvn buid
 4.Set goals as spring-boot:run in run configuration.
 
-Access the server using POSTMAN app,by giving respective URL.
+#Unit test
+
+Test the application using POSTMAN app,by giving respective URL.
+
+#API-DOCUMENTATION
+
+For Api documentation please go through below swagger URL
+
+http://<server-name>:<port address>/swagger-ui.html#/

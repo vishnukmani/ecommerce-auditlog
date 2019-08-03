@@ -23,6 +23,8 @@ import com.ecommerce.auditlog.ecommerceauditlog.exceptions.ResourceNotFoundExcep
 import com.ecommerce.auditlog.ecommerceauditlog.model.Product;
 import com.ecommerce.auditlog.ecommerceauditlog.repositoy.ProductRepository;
 
+import io.swagger.annotations.ApiOperation;
+
 
 
 /**
@@ -46,6 +48,7 @@ public class ProductController extends AuditLogSaver{
 	 *
 	 * @return the list
 	 */
+	@ApiOperation(value = "View a list of available products", response = List.class)
 	@GetMapping("/product")
 	public List<Product> getAllProducts() {
 		return productRepository.findAll();
@@ -58,6 +61,7 @@ public class ProductController extends AuditLogSaver{
 	 * @return product by id
 	 * @throws ResourceNotFoundException the resource not found exception
 	 */
+	@ApiOperation(value = "View detail of product with id {id}", response = ResponseEntity.class)
 	@GetMapping("/product/{id}")
 	public ResponseEntity<Product> getUsersById(@PathVariable(value = "id") Long id)
 			throws ResourceNotFoundException {
@@ -75,6 +79,7 @@ public class ProductController extends AuditLogSaver{
 	 * @return product
 	 */
 	@PostMapping("/products")
+	@ApiOperation(value = "Creating a product by passing product JSON", response = ResponseEntity.class)
 	public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
 		product.setCreatedBy(getUserName());
 		product.setUpdatedBy(getUserName());
@@ -98,6 +103,7 @@ public class ProductController extends AuditLogSaver{
 	 * @throws ResourceNotFoundException the resource not found exception
 	 */
 	@PutMapping("/products/{id}")
+	@ApiOperation(value = "Updating a product with id {id}", response = ResponseEntity.class)
 	public ResponseEntity<Product> updateProduct(
 			@PathVariable(value = "id") Long id, @Valid @RequestBody Product productDetails)
 					throws ResourceNotFoundException {
@@ -137,6 +143,7 @@ public class ProductController extends AuditLogSaver{
 	 * @throws Exception the exception
 	 */
 	@DeleteMapping("/product/{id}")
+	@ApiOperation(value = "Deletion of a product with id {id}", response = ResponseEntity.class)
 	public ResponseEntity<Void> deleteProduct(@PathVariable(value = "id") Long id) throws Exception {
 		Product product =
 				productRepository

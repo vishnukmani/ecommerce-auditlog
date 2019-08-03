@@ -43,7 +43,6 @@ public class AuditLogSaver implements Filter{
 		  auditLog.setActionName(actionName);
 		  auditLog.setResponseTime(deltaTime);
 		  auditLog.setResponseStatus(status);
-		  System.out.println("got response for action in"+deltaTime+"ms");
 		  auditLogRepository.save(auditLog);
 		
 	}

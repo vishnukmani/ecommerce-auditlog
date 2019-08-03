@@ -18,6 +18,8 @@ import com.ecommerce.auditlog.ecommerceauditlog.exceptions.ResourceNotFoundExcep
 import com.ecommerce.auditlog.ecommerceauditlog.model.Employee;
 import com.ecommerce.auditlog.ecommerceauditlog.repositoy.EmployeeRepository;
 
+import io.swagger.annotations.ApiOperation;
+
 
 /**
  * 
@@ -25,7 +27,7 @@ import com.ecommerce.auditlog.ecommerceauditlog.repositoy.EmployeeRepository;
  */
 
 @RestController
-@RequestMapping("/employee")
+@RequestMapping("/api/employee")
 public class EmployeeController extends AuditLogSaver{
 
 	final static Logger logger = Logger.getLogger(EmployeeController.class);
@@ -34,8 +36,8 @@ public class EmployeeController extends AuditLogSaver{
 	EmployeeRepository empRepository;
 
 	@RequestMapping(method = RequestMethod.POST)
+	@ApiOperation(value = "Save a particular employee", response = ResponseEntity.class)
 	public ResponseEntity<Employee> addEmployee(@RequestBody Employee employee) {
-		//empService.save(employee);
 		empRepository.save(employee);
 		auditSaveOperation(INSERT_ACTION, getModuleName(),STATUS_OK);
 		logger.debug("Added:: " + employee);
@@ -44,6 +46,7 @@ public class EmployeeController extends AuditLogSaver{
 
 
 	@RequestMapping(method = RequestMethod.PUT)
+	@ApiOperation(value = "Update a particular employee", response = ResponseEntity.class)
 	public ResponseEntity<Void> updateEmployee(@RequestBody Employee employee) throws ResourceNotFoundException {
 		//Employee existingEmp = empService.getById(employee.getId());
 		Employee existingEmp = empRepository.findById(employee.getId()).orElseThrow(() -> new ResourceNotFoundException("User not found on :: " + employee.getId()));
@@ -60,6 +63,7 @@ public class EmployeeController extends AuditLogSaver{
 
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	@ApiOperation(value = "View the details of employee with id{id}", response = ResponseEntity.class)
 	public ResponseEntity<Employee> getEmployee(@PathVariable("id") Long id) throws ResourceNotFoundException {
 		Employee employee = empRepository.findById(id).orElseThrow(() ->
 		new ResourceNotFoundException("User not found on :: " + id ));
@@ -73,6 +77,7 @@ public class EmployeeController extends AuditLogSaver{
 
 
 	@RequestMapping(method = RequestMethod.GET)
+	@ApiOperation(value = "View the details of all employees", response = ResponseEntity.class)
 	public ResponseEntity<List<Employee>> getAllEmployees() {
 		List<Employee> employees = empRepository.findAll();
 		if (employees.isEmpty()) {
@@ -86,6 +91,7 @@ public class EmployeeController extends AuditLogSaver{
 
 
 	@RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
+	@ApiOperation(value = "Delete a particular employee with id{id}", response = ResponseEntity.class)
 	public ResponseEntity<Void> deleteEmployee(@PathVariable("id") Long id) throws ResourceNotFoundException {
 		Employee employee = empRepository.findById(id).orElseThrow(() -> 
 		new ResourceNotFoundException("User not found on :: " + id));
@@ -97,7 +103,7 @@ public class EmployeeController extends AuditLogSaver{
 			empRepository.deleteById(id);
 			auditSaveOperation(DELETE_ACTION, getModuleName(),STATUS_OK);
 			logger.debug("Employee with id " + id + " deleted");
-			return new ResponseEntity<Void>(HttpStatus.GONE);
+			return new ResponseEntity<Void>(HttpStatus.OK);
 		}
 	}
 

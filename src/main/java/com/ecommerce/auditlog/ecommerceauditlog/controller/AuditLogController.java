@@ -21,6 +21,8 @@ import com.ecommerce.auditlog.ecommerceauditlog.exceptions.ResourceNotFoundExcep
 import com.ecommerce.auditlog.ecommerceauditlog.model.AuditLog;
 import com.ecommerce.auditlog.ecommerceauditlog.repositoy.AuditLogRepository;
 
+import io.swagger.annotations.ApiOperation;
+
 
 
 /**
@@ -45,6 +47,7 @@ public class AuditLogController extends AuditLogSaver{
 	 * @return the list
 	 */
 	@GetMapping("/getAll")
+	@ApiOperation(value = "View a list of  all the audit log details", response = List.class)
 	public List<AuditLog> getAllProducts() {
 
 
@@ -59,6 +62,7 @@ public class AuditLogController extends AuditLogSaver{
 	 * @throws ResourceNotFoundException the resource not found exception
 	 */
 	@GetMapping("/user/{user}")
+	@ApiOperation(value = "View audit-log details by user {user} ", response = ResponseEntity.class)
 	public ResponseEntity<List<AuditLog>> getLogByUser(@PathVariable(value = "user") String user)
 			throws ResourceNotFoundException {
 		List<AuditLog> auditlog = auditLogRepository.findAll();
@@ -79,6 +83,7 @@ public class AuditLogController extends AuditLogSaver{
 	 * @return list of AuditLog
 	 */
 	@GetMapping("/module/{module}")
+	@ApiOperation(value = "View audit-log details by module {module} ", response = ResponseEntity.class)
 	public ResponseEntity<List<AuditLog>> getLogByModuleName(@PathVariable(value = "module") String module)
 			throws ResourceNotFoundException {
 		List<AuditLog> auditlog = auditLogRepository.findAll();
@@ -101,6 +106,7 @@ public class AuditLogController extends AuditLogSaver{
 	 * @return list of AuditLog
 	 */
 	@GetMapping("/action/{action}")
+	@ApiOperation(value = "View audit-log details by action {action} Eg.INSERTION ", response = ResponseEntity.class)
 	public ResponseEntity<List<AuditLog>> getLogByActionName(@PathVariable(value = "action") String action)
 			throws ResourceNotFoundException {
 		List<AuditLog> auditlog = auditLogRepository.findAll();
@@ -122,7 +128,8 @@ public class AuditLogController extends AuditLogSaver{
 	 * @throws Exception the exception
 	 */
 	@DeleteMapping("/delete")
-	public Map<String, Boolean> deleteAllLogs(@PathVariable(value = "id") Long id) throws Exception {
+	@ApiOperation(value = "Delete all the Audit-log details", response = Map.class)
+	public Map<String, Boolean> deleteAllLogs() throws Exception {
 		auditLogRepository.deleteAll();
 		Map<String, Boolean> response = new HashMap<>();
 		response.put("all deleted", Boolean.TRUE);

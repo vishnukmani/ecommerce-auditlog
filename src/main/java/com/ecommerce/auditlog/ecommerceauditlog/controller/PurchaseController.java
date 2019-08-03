@@ -25,6 +25,8 @@ import com.ecommerce.auditlog.ecommerceauditlog.exceptions.ResourceNotFoundExcep
 import com.ecommerce.auditlog.ecommerceauditlog.model.Purchase;
 import com.ecommerce.auditlog.ecommerceauditlog.repositoy.PurchaseRepository;
 
+import io.swagger.annotations.ApiOperation;
+
 
 
 /**
@@ -48,6 +50,7 @@ public class PurchaseController extends AuditLogSaver{
    * @return the list
    */
   @GetMapping("/purchase")
+  @ApiOperation(value = "Get all purchase details", response = ResponseEntity.class)
   public List<Purchase> getAllpurchases() {
     return purchaseRepository.findAll();
   }
@@ -60,6 +63,7 @@ public class PurchaseController extends AuditLogSaver{
    * @throws ResourceNotFoundException the resource not found exception
    */
   @GetMapping("/purchase/{id}")
+  @ApiOperation(value = "View purchase details with id {id}", response = ResponseEntity.class)
   public ResponseEntity<Purchase> getUsersById(@PathVariable(value = "id") Long id)
       throws ResourceNotFoundException {
     Purchase purchase =
@@ -76,6 +80,7 @@ public class PurchaseController extends AuditLogSaver{
    * @return purchase
    */
   @PostMapping("/purchases")
+  @ApiOperation(value = "Create a Purchase", response = ResponseEntity.class)
   public ResponseEntity<Purchase> createPurchase(@Valid @RequestBody Purchase purchase) {
 	  purchase.setCreatedBy(getUserName());
 	  purchase.setUpdatedBy(getUserName());
@@ -100,6 +105,7 @@ public class PurchaseController extends AuditLogSaver{
    * @throws ResourceNotFoundException the resource not found exception
    */
   @PutMapping("/purchases/{id}")
+  @ApiOperation(value = "Update purchase details with id {id}", response = ResponseEntity.class)
   public ResponseEntity<Purchase> updatePurchase(
       @PathVariable(value = "id") Long id, @Valid @RequestBody Purchase purchaseDetails)
       throws ResourceNotFoundException {
@@ -141,6 +147,7 @@ public class PurchaseController extends AuditLogSaver{
    * @throws Exception the exception
    */
   @DeleteMapping("/purchase/{id}")
+  @ApiOperation(value = "Delete a purchase with id {id}", response = Map.class)
   public Map<String, Boolean> deletePurchase(@PathVariable(value = "id") Long id) throws Exception {
 	  Map<String, Boolean> response = new HashMap<>();
     Purchase purchase =

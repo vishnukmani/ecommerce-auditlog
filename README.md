@@ -22,9 +22,12 @@ password:password
 #For running application 
 
 1.clone the project.
-2.right click on the project and 
-3.select Run As-->mvn buid
-4.Set goals as spring-boot:run in run configuration.
+2.Create a database named users_database in my-sql db using below SQL statement
+   CREATE DATABASE `users_database` /*!40100 DEFAULT CHARACTER SET utf8 */;
+   Note:database tables will be created automatically.
+3.right click on the project and 
+4.select Run As-->mvn buid
+5.Set goals as spring-boot:run in run configuration.
 
 #Unit test
 
@@ -34,4 +37,4 @@ Test the application using POSTMAN app,by giving respective URL.
 
 For Api documentation please go through below swagger URL
 
-http://<server-name>:<port address>/swagger-ui.html#/
+http://localhost:8085/swagger-ui.html
